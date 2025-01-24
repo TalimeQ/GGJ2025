@@ -1,4 +1,7 @@
+mod input;
+
 use bevy::prelude::*;
+
 
 // Component examples
 enum CellType
@@ -32,7 +35,7 @@ fn main()
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, add_people)
-        .add_systems(Update, hello_world)
+        .add_systems(Update, (hello_world, input::grab_mouse, input::cursor_position))
         .run();
 }
 
