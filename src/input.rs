@@ -2,6 +2,13 @@ use bevy::{prelude::*, window::CursorGrabMode};
 use bevy::input::mouse::MouseMotion;
 use bevy::window::PrimaryWindow;
 
+
+// #[derive(Resource)]
+// pub struct MouseData
+// {
+//     last_mouse_pos: (f32, f32),
+// }
+
 pub fn grab_mouse(
     mut window: Single<&mut Window>,
     mouse: Res<ButtonInput<MouseButton>>,
@@ -36,9 +43,12 @@ fn mouse_click_system(mouse_button_input: Res<ButtonInput<MouseButton>>) {
 
 pub fn cursor_position(
     q_windows: Query<&Window, With<PrimaryWindow>>,
+
 ) {
     // Games typically only have one window (the primary window)
-    if let Some(position) = q_windows.single().cursor_position() {
+    if let Some(position) = q_windows.single().cursor_position()
+    {
+     //   mouse_data.last_mouse_pos = (position.x, position.y);
         println!("Cursor is inside the primary window, at {:?}", position);
     } else {
         println!("Cursor is not in the game window.");
