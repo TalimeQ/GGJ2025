@@ -1,8 +1,14 @@
+mod generator;
+mod game_state;
+
 mod input;
 
 use bevy::prelude::*;
 use bevy::window::WindowMode;
 use std::collections::HashMap;
+use bevy_asset_loader::prelude::*;
+use crate::game_state::*;
+use crate::generator::*;
 
 // Component examples
 #[derive(Clone)]
@@ -77,7 +83,13 @@ fn main()
 {
     App::new()
         .add_plugins(DefaultPlugins)
+        .init_state::<GameStates>()
+        .add_loading_state(
+            LoadingState::new(GameStates::AssetLoading)
+                .continue_to_state(GameStates::Next)
+                .load_collection::<MapSource>())
         .add_systems(Startup, initialize_grid)
+        .add_systems(OnEnter(GameStates::Next), prepare_map)
         .add_systems(Update, (input::grab_mouse, input::cursor_position))
         .run();
 }
