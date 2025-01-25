@@ -6,7 +6,6 @@ mod cells;
 mod gameui;
 mod game_data;
 
-use std::collections::HashMap;
 use std::time::Duration;
 use bevy::diagnostic::LogDiagnosticsPlugin;
 use bevy::prelude::*;
