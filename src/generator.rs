@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 use bevy::asset::{Assets, Handle};
-use bevy::color::{Color, Srgba};
+use bevy::color::{Srgba};
 use bevy::image::Image;
 use bevy::prelude::*;
 use bevy_asset_loader::asset_collection::AssetCollection;
-use crate::{Cell, CellDefinition, CellSpriteSheet, CellType, GridConstants};
+use crate::cells::{CellDefinition, CellSpriteSheet, CellType, Cell};
+use crate::GridConstants;
 
 #[derive(Resource, AssetCollection)]
 pub struct MapSource {
