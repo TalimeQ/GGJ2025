@@ -49,8 +49,8 @@ pub fn cursor_position(
     if let Some(position) = q_windows.single().cursor_position()
     {
      //   mouse_data.last_mouse_pos = (position.x, position.y);
-        println!("Cursor is inside the primary window, at {:?}", position);
+       // println!("Cursor is inside the primary window, at {:?}", position);
     } else {
-        println!("Cursor is not in the game window.");
+     //   println!("Cursor is not in the game window.");
     }
 }
