@@ -12,7 +12,7 @@ impl FromWorld for CellSpriteSheet {
         let texture_atlas = TextureAtlasLayout::from_grid(
             (16, 16).into(), // The size of each image
             1,               // The number of columns
-            3,               // The number of rows
+            5,               // The number of rows
             None,            // Padding
             None,            // Offset
         );
@@ -200,6 +200,29 @@ pub fn update_effects(
 {
     for (cell ,  mut sprite) in query.iter_mut()
     {
+        let special = match cell.cell_type {
+            CellType::Piuuum => {
+                if let Some(atlas) = &mut sprite.texture_atlas
+                {
+                    atlas.index = 4;
+                }
+                1
+            },
+            CellType::KaBum => {
+                if let Some(atlas) = &mut sprite.texture_atlas
+                {
+                    atlas.index = 3;
+                }
+                1
+            },
+            _ => 0
+            };
+
+        if special > 0
+        {
+            continue;
+        }
+
         if cell.cell_pow > 0
         {
             if let Some(atlas) = &mut sprite.texture_atlas
