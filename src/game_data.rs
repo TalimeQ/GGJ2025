@@ -17,7 +17,7 @@ pub struct GameData
     percent_player_filled : f32,
     enemy_filled_win: f32,
     player_filled_win: f32,
-    player_currency : i32,
+    pub player_currency : i32,
     currency_per_tick: i32,
     input_state: InputState
 }
