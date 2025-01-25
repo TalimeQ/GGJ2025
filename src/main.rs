@@ -26,10 +26,12 @@ pub struct GridConstants
     x_max : i32,
     y_max : i32
 }
-
+// Audio shitfest
 fn start_music(asset_server: Res<AssetServer>, mut commands: Commands) {
-    commands.spawn(AudioPlayer::new(
-        asset_server.load("sounds/ZbrodniaPrzeciwLudzkosci.ogg"),
+    commands.spawn((
+        AudioPlayer::new(
+        asset_server.load("sounds/ZbrodniaPrzeciwLudzkosci.ogg")),
+        PlaybackSettings::LOOP,
     ));
 }
 
