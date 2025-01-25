@@ -2,6 +2,7 @@ mod generator;
 mod game_state;
 mod input;
 
+use std::collections::HashMap;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use crate::game_state::*;
