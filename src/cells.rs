@@ -31,7 +31,9 @@ pub enum CellType
 {
     Empty,
     BasicEnemy,
-    BasicPlayer
+    BasicPlayer,
+    Piuuum,
+    KaBum
 }
 
 pub struct CellDefinition
@@ -58,10 +60,23 @@ pub fn cells_system(
 {
     // Each day we strafe further away from god
 
+    if !game_iteration_timer.active {
+        return;
+    }
+
     game_iteration_timer.timer.tick(timer.delta());
 
     if game_iteration_timer.timer.finished()
     {
+        //TODO:: here handle all special cases
+        for mut cell in query.iter_mut() {
+            match cell.cell_type {
+                CellType::Piuuum => continue,
+                CellType::KaBum => continue,
+                _ => continue
+            }
+        }
+
         let mut iter = query.iter_combinations_mut();
 
         while let Some([(mut cell1),(mut cell2)]) = iter.fetch_next()

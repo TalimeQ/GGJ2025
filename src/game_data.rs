@@ -17,7 +17,7 @@ pub struct GameData
     percent_player_filled : f32,
     enemy_filled_win: f32,
     player_filled_win: f32,
-    player_currency : i32,
+    pub(crate) player_currency : i32,
     currency_per_tick: i32,
     input_state: InputState
 }
@@ -103,3 +103,4 @@ pub fn game_loop_system(
     // regardless add resources
     game_data.player_currency += game_data.currency_per_tick;
 }
+

@@ -69,7 +69,8 @@ pub fn initialize_grid(
                     {
                         CellType::Empty => 0,
                         CellType::BasicEnemy=> -1,
-                        CellType::BasicPlayer=> 1
+                        CellType::BasicPlayer=> 1,
+                        _ => 0,
                     };
 
                     commands.spawn(
