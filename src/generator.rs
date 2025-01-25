@@ -75,7 +75,7 @@ pub fn initialize_grid(
                         texture_atlas : Some(TextureAtlas {layout : sprite_atlas.0.clone(), index : cell.sprite_path}),
                         .. default() },
                          Transform::from_xyz(x,y,z),
-                         Cell{cell_type : cell.cell_type.clone(), x: i, y: j, cell_pow: cell_power, neighbors_pow: 0}));
+                         Cell{cell_type : cell.cell_type.clone(), x: i as i32 , y: j as i32 , cell_pow: cell_power, neighbors_pow: 0}));
                 }
                 None => {}
             }

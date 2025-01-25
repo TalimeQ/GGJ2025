@@ -40,7 +40,7 @@ pub fn mouse_click_system(
     if mouse_button_input.just_pressed(MouseButton::Left) {
         commands.spawn((Sprite::from_color(Srgba::rgb(1., 0., 0.), Vec2::new(16., 16.)), //asset_server.load("sprites/EvilBubble.png")
                         Transform::from_xyz(mouse_data.last_mouse_pos.0, mouse_data.last_mouse_pos.1, 0.0),
-                        Cell{cell_type : CellType::BasicPlayer, x: mouse_data.last_mouse_pos.0 as u32, y: mouse_data.last_mouse_pos.1 as u32, cell_pow: 0, neighbors_pow: 0 }));
+                        Cell{cell_type : CellType::BasicPlayer, x: mouse_data.last_mouse_pos.0 as i32, y: mouse_data.last_mouse_pos.1 as i32, cell_pow: 0, neighbors_pow: 0 }));
         println!("left mouse just pressed x: {x}, y: {y}", x = mouse_data.last_mouse_pos.0, y = mouse_data.last_mouse_pos.1);
     }
 
