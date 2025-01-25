@@ -4,7 +4,7 @@ use bevy::color::{Color, Srgba};
 use bevy::image::Image;
 use bevy::prelude::*;
 use bevy_asset_loader::asset_collection::AssetCollection;
-use crate::{Cell, CellDefinition, CellType, GridConstants};
+use crate::{Cell, CellDefinition, CellSpriteSheet, CellType, GridConstants};
 
 #[derive(Resource, AssetCollection)]
 pub struct MapSource {
@@ -24,6 +24,7 @@ pub fn initialize_grid(
     asset_server: Res<AssetServer>,
     map_source: Res<MapSource>,
     images: Res<Assets<Image>>,
+    sprite_atlas : Res<CellSpriteSheet>,
     mut data : ResMut<GridConstants>)
 {
     data.offset = commands.spawn((Camera2d::default(), MainCamera)).id().index() + 1;
@@ -40,9 +41,11 @@ pub fn initialize_grid(
     data.y_max = y_amount as i32;
     data.x_max = x_amount as i32;
 
+    let image : Handle<Image> = asset_server.load("sprites/Spritesheet.png");
+
     let mut cell_hashmap  = HashMap::new();
-    cell_hashmap.insert(ENEMY_CELL, CellDefinition{cell_type : CellType::BasicEnemy, sprite_path: "sprites/EvilBubble.png".to_string()});
-    cell_hashmap.insert(EMPTY_CELL, CellDefinition{cell_type : CellType::Empty, sprite_path: "sprites/NoSprite.png".to_string()});
+    cell_hashmap.insert(ENEMY_CELL, CellDefinition{cell_type : CellType::BasicEnemy, sprite_path: 1 });
+    cell_hashmap.insert(EMPTY_CELL, CellDefinition{cell_type : CellType::Empty, sprite_path: 2  });
 
     let mut rng = rand::thread_rng();
 
@@ -58,9 +61,21 @@ pub fn initialize_grid(
             match cell_hashmap.get(&color.to_hex().as_str().to_lowercase()[1..])
             {
                 Some(cell) => {
-                    commands.spawn((Sprite::from_image( asset_server.load(&cell.sprite_path)),
-                                    Transform::from_xyz(x,y,z),
-                                    Cell{cell_type : cell.cell_type.clone(), x: i, y: j, cell_pow: 0, neighbors_pow: 0}));
+
+                    let cell_power = match cell.cell_type.clone()
+                    {
+                        CellType::Empty => 0,
+                        CellType::BasicEnemy=> -1,
+                        CellType::BasicPlayer=> 1
+                    };
+
+                    commands.spawn(
+                        (Sprite {
+                        image: image.clone(),
+                        texture_atlas : Some(TextureAtlas {layout : sprite_atlas.0.clone(), index : cell.sprite_path}),
+                        .. default() },
+                         Transform::from_xyz(x,y,z),
+                         Cell{cell_type : cell.cell_type.clone(), x: i, y: j, cell_pow: cell_power, neighbors_pow: 0}));
                 }
                 None => {}
             }

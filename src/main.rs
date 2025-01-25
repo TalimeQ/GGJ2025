@@ -19,14 +19,14 @@ pub enum CellType
 }
 
 #[derive(Resource)]
-struct CellSpriteSheet;
+struct CellSpriteSheet(Handle<TextureAtlasLayout>);
 
 impl FromWorld for CellSpriteSheet {
     fn from_world(world: &mut World) -> Self {
         let texture_atlas = TextureAtlasLayout::from_grid(
-            (24, 24).into(), // The size of each image
-            7,               // The number of columns
-            1,               // The number of rows
+            (16, 16).into(), // The size of each image
+            1,               // The number of columns
+            3,               // The number of rows
             None,            // Padding
             None,            // Offset
         );
@@ -50,7 +50,7 @@ pub struct GridConstants
 pub struct CellDefinition
 {
     cell_type : CellType,
-    sprite_path: String
+    sprite_path: usize
 }
 
 #[derive(Component)]
@@ -63,10 +63,13 @@ struct Cell
     neighbors_pow : i32
 }
 
-pub fn cells_system(mut query: Query<(&mut Cell)>, data: Res<GridConstants>)
+pub fn cells_system(mut query: Query<&mut Cell>, data: Res<GridConstants>)
 {
     // Each day we strafe further away from god
-    for [cell1, cell2] in query.iter_combinations_mut()
+
+    let mut iter = query.iter_combinations_mut();
+
+    while let Some([(mut cell1),(mut cell2)]) = iter.fetch_next()
     {
         // TODO REFACTOR
         if cell1.x == cell2.x && (cell1.y == cell2.y + 1 ||  cell1.y == cell2.y - 1)
@@ -87,7 +90,7 @@ pub fn cells_system(mut query: Query<(&mut Cell)>, data: Res<GridConstants>)
         }
     }
 
-    for cell in query.iter_mut()
+    for mut cell in query.iter_mut()
     {
         // i wont spend million years on searching for math lib
         cell.cell_pow += cell.neighbors_pow.signum() as i32 ;
@@ -97,21 +100,30 @@ pub fn cells_system(mut query: Query<(&mut Cell)>, data: Res<GridConstants>)
 }
 
 fn update_effects(
-    mut query: Query<(Cell,&mut Sprite)>)
+    mut query: Query<(&mut Cell,&mut Sprite)>)
 {
-    for (cell ,  sprite) in query.iter_mut()
+    for (cell ,  mut sprite) in query.iter_mut()
     {
         if cell.cell_pow > 0
         {
-
+            if let Some(atlas) = &mut sprite.texture_atlas
+            {
+                atlas.index = 1;
+            }
         }
         else if cell.cell_pow < 0
         {
-
+            if let Some(atlas) = &mut sprite.texture_atlas
+            {
+                atlas.index = 0;
+            }
         }
         else
         {
-
+            if let Some(atlas) = &mut sprite.texture_atlas
+            {
+                atlas.index = 2;
+            }
         }
     }
 }
@@ -119,16 +131,17 @@ fn update_effects(
 fn main()
 {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .init_state::<GameStates>()
         .init_resource::<GridConstants>()
         .init_resource::<MouseData>()
+        .init_resource::<CellSpriteSheet>()
         .add_loading_state(
             LoadingState::new(GameStates::AssetLoading)
                 .continue_to_state(GameStates::Next)
                 .load_collection::<MapSource>())
         .add_systems(OnEnter(GameStates::Next), initialize_grid)
-        .add_systems(Update, (grab_mouse, cursor_position, mouse_click_system).chain())
+        .add_systems(Update, (grab_mouse, cursor_position, mouse_click_system,cells_system,update_effects).chain())
         .run();
 }
 
