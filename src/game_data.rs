@@ -103,4 +103,3 @@ pub fn game_loop_system(
     // regardless add resources
     game_data.player_currency += game_data.currency_per_tick;
 }
-

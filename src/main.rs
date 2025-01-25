@@ -36,7 +36,8 @@ fn main()
         .init_resource::<GridConstants>()
         .init_resource::<MouseData>()
         .init_resource::<CellSpriteSheet>()
-        .init_resource::<crate::gameui::UiWrapperSheet>()
+        .init_resource::<crate::gameui::LetterSheet>()
+        .init_resource::<crate::gameui::ActiveSheet>()
         .init_resource::<GameData>()
         .insert_resource::<GameIterationTimer>(GameIterationTimer{
             timer: Timer::new(Duration::from_millis(800), TimerMode::Repeating),
