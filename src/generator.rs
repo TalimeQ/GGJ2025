@@ -60,7 +60,7 @@ pub fn initialize_grid(
                 Some(cell) => {
                     commands.spawn((Sprite::from_image( asset_server.load(&cell.sprite_path)),
                                     Transform::from_xyz(x,y,z),
-                                    Cell{cell_type : cell.cell_type.clone(), x: i as i32, y: j as i32 }));
+                                    Cell{cell_type : cell.cell_type.clone(), x: i, y: j, cell_pow: 0, neighbors_pow: 0}));
                 }
                 None => {}
             }

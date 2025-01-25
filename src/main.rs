@@ -116,31 +116,6 @@ fn update_effects(
     }
 }
 
-// Component initialization example
-fn initialize_grid(mut commands: Commands, asset_server: Res<AssetServer>, mut data : ResMut<GridConstants>)
-{
-    data.offset = commands.spawn(Camera2d).id().index() + 1;
-
-    let sprite_size :f32 = 16.;
-
-    let x_amount : i32 =  40;
-    let y_amount : i32 =  20;
-
-    let x_offset : f32 = x_amount as f32 / 2. * sprite_size;
-    let y_offset : f32 = y_amount as f32 / 2. * sprite_size;
-
-    data.y_max = y_amount;
-    data.x_max = x_amount;
-
-    let mut cell_hashmap  = HashMap::new();
-
-    cell_hashmap.insert(1, CellDefinition{cell_type : CellType::Empty, sprite_path: "sprites/EvilBubble.png".to_string()});
-
-    let  mut entity_id : Entity;
-
-    //
-}
-
 fn main()
 {
     App::new()
