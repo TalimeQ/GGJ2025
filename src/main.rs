@@ -4,12 +4,14 @@ mod input;
 mod timer;
 
 use std::collections::HashMap;
+use std::time::Duration;
+use bevy::diagnostic::LogDiagnosticsPlugin;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use crate::game_state::*;
 use crate::generator::*;
 use crate::input::{cursor_position, grab_mouse, mouse_click_system, MouseData};
-use crate::timer::setup_game_iteration_timer;
+use crate::timer::{GameIterationTimer};
 
 // Component examples
 #[derive(Clone)]
@@ -65,50 +67,63 @@ struct Cell
     neighbors_pow : i32
 }
 
-pub fn cells_system(mut query: Query<&mut Cell>, data: Res<GridConstants>)
+pub fn cells_system(
+    mut query: Query<&mut Cell>,
+    data: Res<GridConstants>,
+    timer: Res<Time>,
+    mut game_iteration_timer: ResMut<GameIterationTimer>)
 {
     // Each day we strafe further away from god
 
-    let mut iter = query.iter_combinations_mut();
+    game_iteration_timer.timer.tick(timer.delta());
 
-    while let Some([(mut cell1),(mut cell2)]) = iter.fetch_next()
+    if game_iteration_timer.timer.finished()
     {
-        // TODO REFACTOR
+        let mut iter = query.iter_combinations_mut();
 
-        if cell1.x == cell2.x && (cell1.y == cell2.y + 1 ||  cell1.y == cell2.y - 1)
+        while let Some([(mut cell1),(mut cell2)]) = iter.fetch_next()
         {
-            cell1.neighbors_pow += cell2.cell_pow;
-        }
-        else if cell1.y == cell2.y && (cell1.x == cell2.x + 1 ||  cell1.x == cell2.x - 1)
-        {
-            cell1.neighbors_pow += cell2.cell_pow;
-        }
-        else if cell1.x == cell2.x - 1 && (cell1.y == cell2.y + 1 || cell1.y == cell2.y - 1)
-        {
-            cell1.neighbors_pow += cell2.cell_pow;
-        }
-        else if cell1.x == cell2.x + 1 && (cell1.y == cell2.y + 1 || cell1.y == cell2.y - 1)
-        {
-            cell1.neighbors_pow += cell2.cell_pow;
+            calc_neighbor(&mut cell1, &*cell2);
+            calc_neighbor(&mut cell2, &*cell1);
         }
 
-
-        if(cell1.neighbors_pow > 10)
+        for mut cell in query.iter_mut()
         {
-            cell1.neighbors_pow = 10;
-        }
-        else if(cell1.neighbors_pow < -10)
-        {
-            cell1.neighbors_pow = -10;
+            // i wont spend million years on searching for math lib
+            cell.cell_pow += cell.neighbors_pow.signum() as i32 ;
+            cell.neighbors_pow = 0;
+            //call function to reassign cell power
         }
     }
+}
 
-    for mut cell in query.iter_mut()
+fn calc_neighbor(cell1: &mut Cell, cell2: &Cell)
+{
+    if cell1.x == cell2.x && (cell1.y == cell2.y + 1 ||  cell1.y == cell2.y - 1)
     {
-        // i wont spend million years on searching for math lib
-        cell.cell_pow += cell.neighbors_pow.signum() as i32 ;
-        cell.neighbors_pow = 0;
-        //call function to reassign cell power
+        cell1.neighbors_pow += cell2.cell_pow;
+    }
+    else if cell1.y == cell2.y && (cell1.x == cell2.x + 1 ||  cell1.x == cell2.x - 1)
+    {
+        cell1.neighbors_pow += cell2.cell_pow;
+    }
+    else if cell1.x == cell2.x - 1 && (cell1.y == cell2.y + 1 || cell1.y == cell2.y - 1)
+    {
+        cell1.neighbors_pow += cell2.cell_pow;
+    }
+    else if cell1.x == cell2.x + 1 && (cell1.y == cell2.y + 1 || cell1.y == cell2.y - 1)
+    {
+        cell1.neighbors_pow += cell2.cell_pow;
+    }
+
+
+    if(cell1.neighbors_pow > 10)
+    {
+        cell1.neighbors_pow = 10;
+    }
+    else if(cell1.neighbors_pow < -10)
+    {
+        cell1.neighbors_pow = -10;
     }
 }
 
@@ -121,14 +136,14 @@ fn update_effects(
         {
             if let Some(atlas) = &mut sprite.texture_atlas
             {
-                atlas.index = 1;
+                atlas.index = 0;
             }
         }
         else if cell.cell_pow < 0
         {
             if let Some(atlas) = &mut sprite.texture_atlas
             {
-                atlas.index = 0;
+                atlas.index = 1;
             }
         }
         else
@@ -145,15 +160,19 @@ fn main()
 {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(LogDiagnosticsPlugin::default())
         .init_state::<GameStates>()
         .init_resource::<GridConstants>()
         .init_resource::<MouseData>()
         .init_resource::<CellSpriteSheet>()
+        .insert_resource::<GameIterationTimer>(GameIterationTimer{
+            timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating)
+        })
         .add_loading_state(
             LoadingState::new(GameStates::AssetLoading)
                 .continue_to_state(GameStates::Next)
                 .load_collection::<MapSource>())
-        .add_systems(OnEnter(GameStates::Next), (initialize_grid, setup_game_iteration_timer).chain())
+        .add_systems(OnEnter(GameStates::Next), (initialize_grid).chain())
         .add_systems(Update, (grab_mouse, cursor_position, mouse_click_system,cells_system,update_effects).chain())
         .run();
 }

@@ -17,6 +17,7 @@ pub struct MainCamera;
 
 const ENEMY_CELL: &str = "ac3232"; //RED
 const EMPTY_CELL: &str = "ffffff"; //WHITE
+const OUR_CELL: &str = "99e550"; // Green?
 
 pub const SPRITE_SIZE: f32 = 16.0;
 
@@ -46,6 +47,7 @@ pub fn initialize_grid(
     let mut cell_hashmap  = HashMap::new();
     cell_hashmap.insert(ENEMY_CELL, CellDefinition{cell_type : CellType::BasicEnemy, sprite_path: 1 });
     cell_hashmap.insert(EMPTY_CELL, CellDefinition{cell_type : CellType::Empty, sprite_path: 2  });
+    cell_hashmap.insert(OUR_CELL, CellDefinition{cell_type : CellType::BasicPlayer, sprite_path: 0  });
 
     let mut rng = rand::thread_rng();
 
