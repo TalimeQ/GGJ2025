@@ -59,8 +59,8 @@ pub struct CellDefinition
 struct Cell
 {
     cell_type: CellType,
-    x : u32,
-    y : u32,
+    x : i32,
+    y : i32,
     cell_pow : i32,
     neighbors_pow : i32
 }
@@ -74,6 +74,7 @@ pub fn cells_system(mut query: Query<&mut Cell>, data: Res<GridConstants>)
     while let Some([(mut cell1),(mut cell2)]) = iter.fetch_next()
     {
         // TODO REFACTOR
+
         if cell1.x == cell2.x && (cell1.y == cell2.y + 1 ||  cell1.y == cell2.y - 1)
         {
             cell1.neighbors_pow += cell2.cell_pow;
@@ -82,13 +83,23 @@ pub fn cells_system(mut query: Query<&mut Cell>, data: Res<GridConstants>)
         {
             cell1.neighbors_pow += cell2.cell_pow;
         }
-        else if cell1.y == cell2.y + 1 && (cell1.x == cell2.x - 1 ||  cell1.x == cell2.x + 1)
+        else if cell1.x == cell2.x - 1 && (cell1.y == cell2.y + 1 || cell1.y == cell2.y - 1)
         {
             cell1.neighbors_pow += cell2.cell_pow;
         }
-        else if cell1.y == cell2.y + 1 && (cell1.x == cell2.x - 1 ||  cell1.x == cell2.x + 1 )
+        else if cell1.x == cell2.x + 1 && (cell1.y == cell2.y + 1 || cell1.y == cell2.y - 1)
         {
             cell1.neighbors_pow += cell2.cell_pow;
+        }
+
+
+        if(cell1.neighbors_pow > 10)
+        {
+            cell1.neighbors_pow = 10;
+        }
+        else if(cell1.neighbors_pow < -10)
+        {
+            cell1.neighbors_pow = -10;
         }
     }
 
