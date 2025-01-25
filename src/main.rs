@@ -34,8 +34,8 @@ pub struct CellDefinition
 struct Cell
 {
     cell_type: CellType,
-    x : i32,
-    y : i32
+    x : u32,
+    y : u32
 }
 
 pub fn cells_system(mut query: Query<(&mut Cell)>, data: Res<GridConstants>)
