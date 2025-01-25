@@ -89,10 +89,43 @@ pub fn cells_system(
 
         for mut cell in query.iter_mut()
         {
-            // i wont spend million years on searching for math lib
-            cell.cell_pow += cell.neighbors_pow.signum() as i32 ;
+            if cell.neighbors_pow > 0
+            {
+                if cell.neighbors_pow < 2 && cell.cell_pow !=0
+                {
+                    cell.cell_pow = 0;
+                    cell.cell_type = CellType::Empty;
+                }
+                else if cell.neighbors_pow == 3 && cell.cell_pow == 0
+                {
+                    cell.cell_type = CellType::BasicPlayer;
+                    cell.cell_pow = 1;
+                }
+                else if cell.neighbors_pow > 3 && cell.cell_pow !=0
+                {
+                    cell.cell_pow = 0;
+                    cell.cell_type = CellType::BasicPlayer;
+                }
+            }
+            else if cell.neighbors_pow < 0
+            {
+                if cell.neighbors_pow == -3 && cell.cell_pow == 0
+                {
+                    cell.cell_type = CellType::BasicEnemy;
+                    cell.cell_pow = -1;
+                }
+                else if cell.neighbors_pow < -3 && cell.cell_pow !=0
+                {
+                    cell.cell_pow = 0;
+                    cell.cell_type = CellType::Empty;
+                }
+            }
+            else {
+                cell.cell_type = CellType::Empty;
+                cell.cell_pow = 0;
+            }
+
             cell.neighbors_pow = 0;
-            //call function to reassign cell power
         }
     }
 }
@@ -166,14 +199,14 @@ fn main()
         .init_resource::<MouseData>()
         .init_resource::<CellSpriteSheet>()
         .insert_resource::<GameIterationTimer>(GameIterationTimer{
-            timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating)
+            timer: Timer::new(Duration::from_millis(800), TimerMode::Repeating)
         })
         .add_loading_state(
             LoadingState::new(GameStates::AssetLoading)
                 .continue_to_state(GameStates::Next)
                 .load_collection::<MapSource>())
         .add_systems(OnEnter(GameStates::Next), (initialize_grid).chain())
-        .add_systems(Update, (grab_mouse, cursor_position, mouse_click_system,cells_system,update_effects).chain())
+        .add_systems(Update, (cursor_position, grab_mouse, mouse_click_system, cells_system,update_effects).chain())
         .run();
 }
 

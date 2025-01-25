@@ -1,7 +1,7 @@
 use bevy::{prelude::*, window::CursorGrabMode};
 use bevy::input::mouse::MouseMotion;
 use bevy::window::PrimaryWindow;
-use crate::{Cell, CellType, GridConstants};
+use crate::{Cell, CellSpriteSheet, CellType, GridConstants};
 use crate::generator::SPRITE_SIZE;
 use crate::timer::GameIterationTimer;
 
@@ -30,19 +30,22 @@ pub fn grab_mouse(
 
 // TODO :: Implement
 pub fn mouse_click_system(
-    mut commands: Commands,
     mouse_button_input: Res<ButtonInput<MouseButton>>,
-    mouse_data: Res<MouseData>)
+    mouse_data: Res<MouseData>,
+    mut q_cells: Query<(&mut Cell, &mut Transform)>)
 {
-    if mouse_button_input.pressed(MouseButton::Left) {
-        //println!("left mouse currently pressed x: {x}, y: {y}", x = mouse_data.last_mouse_pos.0, y = mouse_data.last_mouse_pos.1);
-    }
-
     if mouse_button_input.just_pressed(MouseButton::Left) {
-        commands.spawn((Sprite::from_color(Srgba::rgb(1., 0., 0.), Vec2::new(16., 16.)), //asset_server.load("sprites/EvilBubble.png")
-                        Transform::from_xyz(mouse_data.last_mouse_pos.0, mouse_data.last_mouse_pos.1, 0.0),
-                        Cell{cell_type : CellType::BasicPlayer, x: mouse_data.last_mouse_pos.0 as i32, y: mouse_data.last_mouse_pos.1 as i32, cell_pow: 0, neighbors_pow: 0 }));
-        //println!("left mouse just pressed x: {x}, y: {y}", x = mouse_data.last_mouse_pos.0, y = mouse_data.last_mouse_pos.1);
+        let mut cos = q_cells.iter_mut()
+            .find_map(|cell| if cell.1.translation.x == mouse_data.last_mouse_pos.0 && cell.1.translation.y ==
+            mouse_data.last_mouse_pos.1 { Some(cell) } else {None});
+
+        println!("left mouse currently pressed x: {x}, y: {y}", x = mouse_data.last_mouse_pos.0, y = mouse_data.last_mouse_pos.1);
+        if let Some((mut test, mut transform)) = cos {
+            transform.translation.x = mouse_data.last_mouse_pos.0;
+            transform.translation.y = mouse_data.last_mouse_pos.1;
+            test.cell_type = CellType::BasicPlayer;
+            test.cell_pow = 1;
+        }
     }
 
     if mouse_button_input.just_released(MouseButton::Left) {
