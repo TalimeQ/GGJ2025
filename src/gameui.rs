@@ -135,3 +135,7 @@ pub fn update_gold_tracker(
         iter /= 10;
     }
 }
+pub fn update_active_ability(mut query : Query<&mut Sprite, With<GoldTrackerSprite>>)
+{
+
+}
