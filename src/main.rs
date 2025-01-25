@@ -2,6 +2,7 @@ mod generator;
 mod game_state;
 mod input;
 
+use std::collections::HashMap;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use crate::game_state::*;
@@ -48,52 +49,6 @@ pub fn cells_system(mut query: Query<(&mut Cell)>, data: Res<GridConstants>)
     }
 
     //
-}
-
-// Component initialization example
-fn initialize_grid(mut commands: Commands, asset_server: Res<AssetServer>, mut data : ResMut<GridConstants>)
-{
-    data.offset = commands.spawn(Camera2d).id().index() + 1;
-
-    let sprite_size :f32 = 16.;
-
-    let x_amount : i32 =  40;
-    let y_amount : i32 =  20;
-
-    let x_offset : f32 = x_amount as f32 / 2. * sprite_size;
-    let y_offset : f32 = y_amount as f32 / 2. * sprite_size;
-
-    data.y_max = y_amount;
-    data.x_max = x_amount;
-
-    let mut cell_hashmap  = HashMap::new();
-
-    cell_hashmap.insert(1, CellDefinition{cell_type : CellType::Empty, sprite_path: "sprites/EvilBubble.png".to_string()});
-
-    let  mut entity_id : Entity;
-
-    let mut rng = rand::thread_rng();
-
-    for i in 0..  y_amount
-    {
-        for j in 0.. x_amount
-        {
-            let x: f32 = j as f32 * sprite_size - x_offset;
-            let y: f32 = i as f32 * sprite_size - y_offset;
-            let z: f32 = 0.;
-
-            match cell_hashmap.get(&1)
-            {
-                Some(cell) => {
-                    entity_id = commands.spawn((Sprite::from_image( asset_server.load(&cell.sprite_path)),
-                                    Transform::from_xyz(x,y,z),
-                                    Cell{cell_type : cell.cell_type.clone()})).id();
-                }
-                None => {}
-            }
-        }
-    }
-
 }
 
 fn main()

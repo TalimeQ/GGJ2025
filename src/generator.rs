@@ -4,7 +4,7 @@ use bevy::color::{Color, Srgba};
 use bevy::image::Image;
 use bevy::prelude::*;
 use bevy_asset_loader::asset_collection::AssetCollection;
-use crate::{Cell, CellDefinition, CellType};
+use crate::{Cell, CellDefinition, CellType, GridConstants};
 
 #[derive(Resource, AssetCollection)]
 pub struct MapSource {
@@ -20,9 +20,10 @@ pub fn initialize_grid(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     map_source: Res<MapSource>,
-    images: Res<Assets<Image>>)
+    images: Res<Assets<Image>>,
+    mut data : ResMut<GridConstants>)
 {
-    commands.spawn(Camera2d);
+    data.offset = commands.spawn(Camera2d).id().index() + 1;
     let map = images.get(&map_source.map_tiles).unwrap();
 
     let sprite_size :f32 = 16.;
@@ -32,6 +33,9 @@ pub fn initialize_grid(
 
     let x_offset : f32 = x_amount as f32 / 2. * sprite_size;
     let y_offset : f32 = y_amount as f32 / 2. * sprite_size;
+
+    data.y_max = y_amount as i32;
+    data.x_max = x_amount as i32;
 
     let mut cell_hashmap  = HashMap::new();
     cell_hashmap.insert(ENEMY_CELL, CellDefinition{cell_type : CellType::BasicEnemy, sprite_path: "sprites/EvilBubble.png".to_string()});
@@ -53,7 +57,7 @@ pub fn initialize_grid(
                 Some(cell) => {
                     commands.spawn((Sprite::from_image( asset_server.load(&cell.sprite_path)),
                                     Transform::from_xyz(x,y,z),
-                                    Cell{cell_type : cell.cell_type.clone()}));
+                                    Cell{cell_type : cell.cell_type.clone(), x: i as i32, y: j as i32 }));
                 }
                 None => {}
             }
