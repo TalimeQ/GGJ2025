@@ -1,9 +1,8 @@
 use bevy::{prelude::*, window::CursorGrabMode};
 use bevy::input::mouse::MouseMotion;
-use bevy::text::cosmic_text::SwashContent::Color;
 use bevy::window::PrimaryWindow;
 use crate::{Cell, CellType};
-use crate::generator::MainCamera;
+use crate::generator::SPRITE_SIZE;
 
 #[derive(Resource, Default)]
 pub struct MouseData
@@ -30,6 +29,7 @@ pub fn grab_mouse(
 
 // TODO :: Implement
 pub fn mouse_click_system(
+    mut commands: Commands,
     mouse_button_input: Res<ButtonInput<MouseButton>>,
     mouse_data: Res<MouseData>)
 {
@@ -38,6 +38,9 @@ pub fn mouse_click_system(
     }
 
     if mouse_button_input.just_pressed(MouseButton::Left) {
+        commands.spawn((Sprite::from_color(Srgba::rgb(1., 0., 0.), Vec2::new(16., 16.)), //asset_server.load("sprites/EvilBubble.png")
+                        Transform::from_xyz(mouse_data.last_mouse_pos.0, mouse_data.last_mouse_pos.1, 0.0),
+                        Cell{cell_type : CellType::BasicPlayer, x: mouse_data.last_mouse_pos.0 as u32, y: mouse_data.last_mouse_pos.1 as u32, cell_pow: 0, neighbors_pow: 0 }));
         println!("left mouse just pressed x: {x}, y: {y}", x = mouse_data.last_mouse_pos.0, y = mouse_data.last_mouse_pos.1);
     }
 
@@ -47,19 +50,17 @@ pub fn mouse_click_system(
 }
 
 pub fn cursor_position(
-    mut commands: Commands,
     q_windows: Query<&Window, With<PrimaryWindow>>,
-    //asset_server: Res<AssetServer>,
     mut mouse_data: ResMut<MouseData>
 ) {
-    // if let Some(position) = q_windows.single().cursor_position()
-    // {
-    //     mouse_data.last_mouse_pos = (position.x, position.y);
-    //     commands.spawn((Sprite::from_color(Srgba::rgb(1., 0., 0.), Vec2::new(16., 16.)), //asset_server.load("sprites/EvilBubble.png")
-    //                     Transform::from_xyz(position.x, position.y, 0.0),
-    //                     Cell{cell_type : CellType::BasicPlayer, x: position.x as i32, y: position.y as i32 }));
-    //    // println!("Cursor is inside the primary window, at {:?}", position);
-    // } else {
-    //  //   println!("Cursor is not in the game window.");
-    // }
+    if let Some(position) = q_windows.single().cursor_position()
+    {
+        let width = q_windows.single().width() / 2.;
+        let height = q_windows.single().height() / 2.;
+
+        mouse_data.last_mouse_pos = (((position.x / SPRITE_SIZE) as u32) as f32 * SPRITE_SIZE - width + SPRITE_SIZE / 2.0,
+                                     -(((position.y / SPRITE_SIZE) as u32) as f32 * SPRITE_SIZE - height + SPRITE_SIZE / 2.0));
+    } else {
+     //   println!("Cursor is not in the game window.");
+    }
 }

@@ -18,6 +18,8 @@ pub struct MainCamera;
 const ENEMY_CELL: &str = "ac3232"; //RED
 const EMPTY_CELL: &str = "ffffff"; //WHITE
 
+pub const SPRITE_SIZE: f32 = 16.0;
+
 
 pub fn initialize_grid(
     mut commands: Commands,
@@ -30,13 +32,11 @@ pub fn initialize_grid(
     data.offset = commands.spawn((Camera2d::default(), MainCamera)).id().index() + 1;
     let map = images.get(&map_source.map_tiles).unwrap();
 
-    let sprite_size :f32 = 16.;
-
     let x_amount : u32 =  map.width();
     let y_amount : u32 =  map.height();
 
-    let x_offset : f32 = x_amount as f32 / 2. * sprite_size;
-    let y_offset : f32 = y_amount as f32 / 2. * sprite_size;
+    let x_offset : f32 = x_amount as f32 / 2. * SPRITE_SIZE;
+    let y_offset : f32 = y_amount as f32 / 2. * SPRITE_SIZE;
 
     data.y_max = y_amount as i32;
     data.x_max = x_amount as i32;
@@ -53,8 +53,8 @@ pub fn initialize_grid(
     {
         for j in 0.. x_amount
         {
-            let x: f32 = j as f32 * sprite_size - x_offset;
-            let y: f32 = -(i as f32 * sprite_size - y_offset);
+            let x: f32 = j as f32 * SPRITE_SIZE - x_offset + SPRITE_SIZE/2.0;
+            let y: f32 = -(i as f32 * SPRITE_SIZE - y_offset);
             let z: f32 = 0.;
 
             let color : Srgba = map.get_color_at(j, i).unwrap().into();
