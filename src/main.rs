@@ -16,7 +16,7 @@ use crate::game_data::{game_loop_system, GameData};
 use crate::game_state::*;
 use crate::gameui::spawn_ui;
 use crate::generator::*;
-use crate::input::{cursor_position, grab_mouse, mouse_click_system, MouseData};
+use crate::input::{cursor_position, equip_magic_items, grab_mouse, mouse_click_system, MouseData};
 use crate::timer::{GameIterationTimer};
 
 #[derive(Resource, Default)]
@@ -46,14 +46,17 @@ fn main()
         .init_resource::<crate::gameui::ActiveSheet>()
         .init_resource::<GameData>()
         .insert_resource::<GameIterationTimer>(GameIterationTimer{
-            timer: Timer::new(Duration::from_millis(800), TimerMode::Repeating)
+            timer: Timer::new(Duration::from_millis(800), TimerMode::Repeating),
+            active: true,
         })
         .add_loading_state(
             LoadingState::new(GameStates::AssetLoading)
                 .continue_to_state(GameStates::Next)
                 .load_collection::<MapSource>())
         .add_systems(OnEnter(GameStates::Next), (spawn_ui,start_music,initialize_grid).chain())
-        .add_systems(Update, (cursor_position, grab_mouse, mouse_click_system, cells_system, update_effects, game_loop_system).chain())
+        .add_systems(Update, (cursor_position, grab_mouse, mouse_click_system,
+                              equip_magic_items, cells_system, update_effects,
+                              game_loop_system).chain())
         .run();
 }
 
