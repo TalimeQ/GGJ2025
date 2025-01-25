@@ -26,6 +26,12 @@ pub struct GridConstants
     y_max : i32
 }
 
+fn start_music(asset_server: Res<AssetServer>, mut commands: Commands) {
+    commands.spawn(AudioPlayer::new(
+        asset_server.load("sounds/ZbrodniaPrzeciwLudzkosci.ogg"),
+    ));
+}
+
 fn main()
 {
     App::new()
@@ -46,7 +52,7 @@ fn main()
             LoadingState::new(GameStates::AssetLoading)
                 .continue_to_state(GameStates::Next)
                 .load_collection::<MapSource>())
-        .add_systems(OnEnter(GameStates::Next), (spawn_ui,initialize_grid).chain())
+        .add_systems(OnEnter(GameStates::Next), (spawn_ui,start_music,initialize_grid).chain())
         .add_systems(Update, (cursor_position, grab_mouse, mouse_click_system,
                               equip_magic_items, cells_system, update_effects,
                               game_loop_system).chain())
