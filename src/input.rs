@@ -65,14 +65,14 @@ pub fn mouse_click_system(
                 mouse_data.last_mouse_pos,
                 game_data.player_currency
             ),
-            MagicItem::KaBum(cost, range) => spawn_piuuum(
+            MagicItem::KaBum(cost, range) => spawn_kabum(
                 cost,
                 range,
                 q_cells,
                 mouse_data.last_mouse_pos,
                 game_data.player_currency
             ),
-            _ => return,
+            _ => 0,
         };
         game_data.player_currency -= cost;
     }

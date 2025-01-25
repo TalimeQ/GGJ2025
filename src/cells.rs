@@ -1,6 +1,7 @@
 use bevy::asset::{Assets, Handle};
 use bevy::prelude::{Component, FromWorld, Query, Res, ResMut, Resource, Sprite, TextureAtlasLayout, Time, World};
 use crate::{GridConstants};
+use crate::game_data::GameData;
 use crate::timer::GameIterationTimer;
 
 #[derive(Resource)]
@@ -42,7 +43,7 @@ pub struct CellDefinition
     pub(crate) sprite_path: usize
 }
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct Cell
 {
     pub(crate) cell_type: CellType,
@@ -56,7 +57,8 @@ pub fn cells_system(
     mut query: Query<&mut Cell>,
     data: Res<GridConstants>,
     timer: Res<Time>,
-    mut game_iteration_timer: ResMut<GameIterationTimer>)
+    mut game_iteration_timer: ResMut<GameIterationTimer>,
+    mut game_data: ResMut<GameData>)
 {
     // Each day we strafe further away from god
 
@@ -69,11 +71,43 @@ pub fn cells_system(
     if game_iteration_timer.timer.finished()
     {
         //TODO:: here handle all special cases
-        for mut cell in query.iter_mut() {
+        let mut kill_me: Vec<Cell> = Vec::new();
+        for cell in query.iter() {
             match cell.cell_type {
-                CellType::Piuuum => continue,
-                CellType::KaBum => continue,
+                CellType::Piuuum => {
+                    let to_kill = query.iter().filter_map(|target|
+                        if target.x >= cell.x - cell.cell_pow &&
+                            target.x <= cell.x + cell.cell_pow &&
+                            target.y >= cell.y - cell.cell_pow &&
+                            target.y <= cell.y + cell.cell_pow { Some(target)} else { None });
+
+                    for  target in to_kill {
+                        kill_me.push(target.clone());
+                    }
+                },
+                CellType::KaBum => {
+                    let to_kill = query.iter().filter_map(|target|
+                        if target.x >= cell.x - cell.cell_pow &&
+                            target.x <= cell.x + cell.cell_pow &&
+                            target.y >= cell.y - cell.cell_pow &&
+                            target.y <= cell.y + cell.cell_pow { Some(target)} else { None });
+
+                    for  target in to_kill {
+                        kill_me.push(target.clone());
+                    }
+                },
                 _ => continue
+            }
+        }
+
+        for cell in kill_me{
+            let mut to_kill = query.iter_mut().filter_map(|target|
+                if target.x == cell.x && target.y == cell.y { Some(target)} else { None });
+
+            if let Some(mut target) = to_kill.next() {
+                target.cell_pow = 0;
+                target.cell_type = CellType::Empty;
+                target.neighbors_pow = 0
             }
         }
 
@@ -125,6 +159,9 @@ pub fn cells_system(
 
             cell.neighbors_pow = 0;
         }
+
+        // regardless add resources
+        game_data.player_currency += game_data.currency_per_tick;
     }
 }
 
