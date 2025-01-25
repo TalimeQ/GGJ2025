@@ -12,6 +12,9 @@ pub struct MapSource {
     map_tiles: Handle<Image>,
 }
 
+#[derive(Component)]
+pub struct MainCamera;
+
 const ENEMY_CELL: &str = "ac3232"; //RED
 const EMPTY_CELL: &str = "ffffff"; //WHITE
 
@@ -23,7 +26,7 @@ pub fn initialize_grid(
     images: Res<Assets<Image>>,
     mut data : ResMut<GridConstants>)
 {
-    data.offset = commands.spawn(Camera2d).id().index() + 1;
+    data.offset = commands.spawn((Camera2d::default(), MainCamera)).id().index() + 1;
     let map = images.get(&map_source.map_tiles).unwrap();
 
     let sprite_size :f32 = 16.;
