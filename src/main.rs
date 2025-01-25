@@ -1,6 +1,7 @@
 mod generator;
 mod game_state;
 mod input;
+mod timer;
 
 use std::collections::HashMap;
 use bevy::prelude::*;
@@ -8,6 +9,7 @@ use bevy_asset_loader::prelude::*;
 use crate::game_state::*;
 use crate::generator::*;
 use crate::input::{cursor_position, grab_mouse, mouse_click_system, MouseData};
+use crate::timer::setup_game_iteration_timer;
 
 // Component examples
 #[derive(Clone)]
@@ -140,7 +142,7 @@ fn main()
             LoadingState::new(GameStates::AssetLoading)
                 .continue_to_state(GameStates::Next)
                 .load_collection::<MapSource>())
-        .add_systems(OnEnter(GameStates::Next), initialize_grid)
+        .add_systems(OnEnter(GameStates::Next), (initialize_grid, setup_game_iteration_timer).chain())
         .add_systems(Update, (grab_mouse, cursor_position, mouse_click_system,cells_system,update_effects).chain())
         .run();
 }
