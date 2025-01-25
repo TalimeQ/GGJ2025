@@ -2,6 +2,8 @@ mod generator;
 mod game_state;
 mod input;
 mod timer;
+mod gameui;
+mod game_data;
 
 use std::collections::HashMap;
 use std::time::Duration;
@@ -9,6 +11,7 @@ use bevy::diagnostic::LogDiagnosticsPlugin;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use crate::game_state::*;
+use crate::gameui::spawn_ui;
 use crate::generator::*;
 use crate::input::{cursor_position, grab_mouse, mouse_click_system, MouseData};
 use crate::timer::{GameIterationTimer};
@@ -66,6 +69,7 @@ struct Cell
     cell_pow : i32,
     neighbors_pow : i32
 }
+
 
 pub fn cells_system(
     mut query: Query<&mut Cell>,
@@ -159,12 +163,13 @@ fn update_effects(
 fn main()
 {
     App::new()
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins((DefaultPlugins.set(ImagePlugin::default_nearest())))
         .add_plugins(LogDiagnosticsPlugin::default())
         .init_state::<GameStates>()
         .init_resource::<GridConstants>()
         .init_resource::<MouseData>()
         .init_resource::<CellSpriteSheet>()
+        .init_resource::<crate::gameui::UiWrapperSheet>()
         .insert_resource::<GameIterationTimer>(GameIterationTimer{
             timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating)
         })
@@ -172,7 +177,7 @@ fn main()
             LoadingState::new(GameStates::AssetLoading)
                 .continue_to_state(GameStates::Next)
                 .load_collection::<MapSource>())
-        .add_systems(OnEnter(GameStates::Next), (initialize_grid).chain())
+        .add_systems(OnEnter(GameStates::Next), (spawn_ui,initialize_grid).chain())
         .add_systems(Update, (grab_mouse, cursor_position, mouse_click_system,cells_system,update_effects).chain())
         .run();
 }

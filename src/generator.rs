@@ -30,7 +30,6 @@ pub fn initialize_grid(
     sprite_atlas : Res<CellSpriteSheet>,
     mut data : ResMut<GridConstants>)
 {
-    data.offset = commands.spawn((Camera2d::default(), MainCamera)).id().index() + 1;
     let map = images.get(&map_source.map_tiles).unwrap();
 
     let x_amount : u32 =  map.width();
