@@ -7,6 +7,7 @@ mod gameui;
 mod game_data;
 
 use std::time::Duration;
+use bevy::audio::PlaybackMode;
 use bevy::diagnostic::LogDiagnosticsPlugin;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
@@ -49,7 +50,11 @@ impl Default for PopSound
 
 #[derive(Resource)]
 struct SoundHandles {
-    one: Handle<AudioSource>,
+    pop_one: Handle<AudioSource>,
+    pop_two: Handle<AudioSource>,
+    pop_three: Handle<AudioSource>,
+    pop_four: Handle<AudioSource>,
+    pop_five: Handle<AudioSource>,
     place_one: Handle<AudioSource>,
     place_two: Handle<AudioSource>,
     place_three: Handle<AudioSource>,
@@ -60,7 +65,11 @@ impl FromWorld for SoundHandles {
     fn from_world(world: &mut World) -> Self {
         let asset_server = world.resource::<AssetServer>();
         Self {
-            one: asset_server.load("sounds/popsound.ogg"),
+            pop_one: asset_server.load("sounds/popsound.ogg"),
+            pop_two: asset_server.load("sounds/popsound1.ogg"),
+            pop_three: asset_server.load("sounds/popsound2.ogg"),
+            pop_four: asset_server.load("sounds/popsound3.ogg"),
+            pop_five: asset_server.load("sounds/popsound4.ogg"),
             place_one: asset_server.load("sounds/place1.ogg"),
             place_two: asset_server.load("sounds/place2.ogg"),
             place_three: asset_server.load("sounds/place3.ogg"),
@@ -87,12 +96,28 @@ fn play_sound(mut sound_res: ResMut<PopSound>,
 {
     if sound_res.should_play_pop
     {
-        let random_number = rand::thread_rng().gen_range(0..=10);
+        let random_number = rand::thread_rng().gen_range(0..=4);
         // We killed the god
         match random_number
         {
+            0=> {
+                commands.spawn((AudioPlayer::new(handles_res.pop_four.clone()),
+                                PlaybackSettings::DESPAWN));
+            }
+            1=> {
+                commands.spawn((AudioPlayer::new(handles_res.pop_three.clone()),
+                                PlaybackSettings::DESPAWN));
+            }
+            2=> {
+                commands.spawn((AudioPlayer::new(handles_res.pop_four.clone()),
+                                PlaybackSettings::DESPAWN));
+            }
+            3=> {
+                commands.spawn((AudioPlayer::new(handles_res.pop_five.clone()),
+                                PlaybackSettings::DESPAWN));
+            }
           _=> {
-              commands.spawn((AudioPlayer::new(handles_res.one.clone()),
+              commands.spawn((AudioPlayer::new(handles_res.pop_one.clone()),
                               PlaybackSettings::DESPAWN));
           }
         }
