@@ -1,6 +1,6 @@
 use bevy::asset::{Assets, Handle};
 use bevy::prelude::{Component, FromWorld, Query, Res, ResMut, Resource, Sprite, TextureAtlasLayout, Time, World};
-use crate::{GridConstants};
+use crate::{GridConstants, PopSound};
 use crate::game_data::GameData;
 use crate::timer::GameIterationTimer;
 
@@ -55,7 +55,7 @@ pub struct Cell
 
 pub fn cells_system(
     mut query: Query<&mut Cell>,
-    data: Res<GridConstants>,
+    mut sound_data : ResMut<PopSound>,
     timer: Res<Time>,
     mut game_iteration_timer: ResMut<GameIterationTimer>,
     mut game_data: ResMut<GameData>)
@@ -70,6 +70,9 @@ pub fn cells_system(
 
     if game_iteration_timer.timer.finished()
     {
+        // Audio Shit
+        sound_data.should_play_pop = true;
+
         //TODO:: here handle all special cases
         let mut kill_me: Vec<Cell> = Vec::new();
         for cell in query.iter() {
