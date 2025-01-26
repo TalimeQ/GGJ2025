@@ -7,7 +7,7 @@ use crate::generator::MainCamera;
 #[derive(Component)]
 pub struct GoldTrackerSprite
 {
-
+    order: usize
 }
 
 #[derive(Component)]
@@ -100,7 +100,7 @@ pub fn spawn_ui(mut commands: Commands,
                 image: image.clone(),
                 texture_atlas : Some(TextureAtlas
                 {layout : sprite_atlas.0.clone(), index : in_index}), .. default() },
-                            Transform::from_xyz(initial_offset_x,initial_offset_y,1.)));
+                            Transform::from_xyz(initial_offset_x,initial_offset_y,1.),GoldTrackerSprite{ order: i}));
 
         }
         else
@@ -109,31 +109,46 @@ pub fn spawn_ui(mut commands: Commands,
                 image: image.clone(),
                 texture_atlas : Some(TextureAtlas
                 {layout : sprite_atlas.0.clone(), index : in_index}), .. default() },
-                            Transform::from_xyz(initial_offset_x,initial_offset_y,1.),GoldTrackerSprite{}
+                            Transform::from_xyz(initial_offset_x,initial_offset_y,1.)
             ));
         }
     }
 }
 
 pub fn update_gold_tracker(
-    mut query : Query<&mut Sprite, With<GoldTrackerSprite>>,
-    game_data: Res<GameData>
-)
+    mut query : Query<(&mut Sprite, &GoldTrackerSprite), With<GoldTrackerSprite>>,
+    game_data: Res<GameData>)
 {
     let zero_index = 32;
-    let cache_cash = game_data.player_currency;
-    let mut iter = 100000;
+    let mut cache_cash = game_data.player_currency;
+    let mut iter = 100_000;
 
 
-    for mut sprite in query.iter_mut()
+    for i in [11, 10, 9, 8,7, 6]
     {
-        if let Some(atlas) = &mut sprite.texture_atlas
-        {
-            atlas.index = zero_index + (cache_cash / iter ) as usize;
-        }
+        let mut sprite = query.iter_mut()
+            .find_map(|a| if a.1.order == i { Some(a.0) } else { None });
 
-        iter /= 10;
+        if let Some(s) = &mut sprite
+        {
+            if let Some(atlas) = &mut s.texture_atlas
+            {
+                atlas.index = zero_index + ((cache_cash %10) as usize);
+                cache_cash /= 10;
+            }
+        }
     }
+
+    // for mut sprite in query.iter_mut()
+    // {
+    //     if let Some(atlas) = &mut sprite.0.texture_atlas
+    //     {
+    //         atlas.index = zero_index + (cache_cash / iter ) as usize;
+    //         cache_cash = cache_cash % iter
+    //     }
+    //
+    //     iter /= 10;
+    // }
 }
 pub fn update_active_ability(mut query : Query<&mut Sprite, With<GoldTrackerSprite>>)
 {

@@ -16,7 +16,7 @@ enum MagicItem {
 
 impl Default for MagicItem {
     fn default() -> Self {
-        Self::PiuPiuPiu(1)
+        Self::PiuPiuPiu(2)
     }
 }
 
@@ -161,6 +161,7 @@ fn find_and_spawn(
     });
 
     if let Some((mut test, mut transform)) = cos {
+
         transform.translation.x = mouse_data.0;
         transform.translation.y = mouse_data.1;
         test.cell_type = cell_type;
@@ -176,12 +177,12 @@ pub fn equip_magic_items(
     if q_key.just_pressed(KeyCode::Space) {
         timer.active = !timer.active;
     } else if q_key.just_pressed(KeyCode::Digit1) {
-        data.equipped_magic_item = MagicItem::PiuPiuPiu(1);
+        data.equipped_magic_item = MagicItem::PiuPiuPiu(2);
     } else if q_key.just_pressed(KeyCode::Digit2) {
-        data.equipped_magic_item = MagicItem::Piuuum(5, 1.);
+        data.equipped_magic_item = MagicItem::Piuuum(10, 2.);
     } else if q_key.just_pressed(KeyCode::Digit3) {
         data.equipped_magic_item = MagicItem::Wololo(20, 3.);
     } else if q_key.just_pressed(KeyCode::Digit4) {
-        data.equipped_magic_item = MagicItem::KaBum(25, 5.);
+        data.equipped_magic_item = MagicItem::KaBum(50, 4.);
     }
 }
