@@ -7,7 +7,7 @@ use bevy::{prelude::*, window::CursorGrabMode};
 use crate::game_data::GameData;
 use crate::timer::GameIterationTimer;
 
-enum MagicItem {
+pub enum MagicItem {
     PiuPiuPiu(i32),
     Piuuum(i32, f32), //radius
     Wololo(i32, f32), // radius
@@ -23,7 +23,7 @@ impl Default for MagicItem {
 #[derive(Resource, Default)]
 pub struct MouseData {
     last_mouse_pos: (f32, f32),
-    equipped_magic_item: MagicItem,
+    pub (crate) equipped_magic_item: MagicItem,
 }
 
 pub fn grab_mouse(
