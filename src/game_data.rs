@@ -32,8 +32,8 @@ impl Default for GameData
             percent_player_filled: 0.,
             enemy_filled_win : 0.8,
             player_filled_win : 0.2,
-            player_currency : 100,
-            currency_per_tick: 10,
+            player_currency : 20,
+            currency_per_tick: 5,
             input_state : InputState::Available
         }
     }

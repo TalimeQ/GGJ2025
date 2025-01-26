@@ -146,7 +146,7 @@ pub fn cells_system(
                     cell.cell_type = CellType::BasicEnemy;
                     cell.cell_pow = -1;
                 }
-                else if cell.neighbors_pow < -3 && cell.cell_pow !=0
+                else if cell.neighbors_pow < -4 && cell.cell_pow !=0
                 {
                     cell.cell_pow = 0;
                     cell.cell_type = CellType::Empty;
