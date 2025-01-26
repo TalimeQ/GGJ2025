@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 use crate::game_data::GameData;
 use crate::generator::MainCamera;
-
+use crate::input::{MagicItem, MouseData};
 
 #[derive(Component)]
 pub struct GoldTrackerSprite
@@ -13,7 +13,7 @@ pub struct GoldTrackerSprite
 #[derive(Component)]
 pub struct ActiveUpgradeTracker
 {
-
+    order: u32
 }
 
 #[derive(Resource)]
@@ -67,6 +67,14 @@ pub fn spawn_ui(mut commands: Commands,
     let image : Handle<Image> = asset_server.load("sprites/font_in_row_unselected_sheet.png");
     let image_actives : Handle<Image> = asset_server.load("sprites/SpriteInActive.png");
 
+    //god gives his toughest battles to his strongest soldiers
+    // i'm not one of them please make it stop
+
+    let image1: Handle<Image> = asset_server.load("sprites/bubblebomb.png");
+    let image2: Handle<Image> = asset_server.load("sprites/bomb.png");
+    let image3: Handle<Image> = asset_server.load("sprites/nuke.png");
+    let image4: Handle<Image> = asset_server.load("sprites/noso.png");
+
     commands.spawn((Camera2d::default(), MainCamera));
 
     commands.spawn(
@@ -82,7 +90,29 @@ pub fn spawn_ui(mut commands: Commands,
             image: image_actives.clone(),
             texture_atlas : Some(TextureAtlas
             {layout : active_atlas .0.clone(), index : 0}), .. default() },
-                        Transform::from_xyz(offset_item_x,offset_item_y,2.)));
+                        Transform::from_xyz(offset_item_x,offset_item_y,2.), ActiveUpgradeTracker{order : i} ));
+
+        if i == 0
+        {
+            commands.spawn((Sprite::from_image(image1.clone()),
+                Transform::from_xyz(offset_item_x,offset_item_y,5.)));
+        }
+        else if i == 1
+        {
+            commands.spawn((Sprite::from_image(image2.clone()),
+                            Transform::from_xyz(offset_item_x,offset_item_y,5.)));
+        }
+        else if i == 3
+        {
+            commands.spawn((Sprite::from_image(image3.clone()),
+                            Transform::from_xyz(offset_item_x,offset_item_y,5.)));
+        }
+        else if i == 2
+        {
+            commands.spawn((Sprite::from_image(image4.clone()),
+                            Transform::from_xyz(offset_item_x,offset_item_y,5.)));
+        }
+
         offset_item_x += 38.0;
     }
 
@@ -150,7 +180,35 @@ pub fn update_gold_tracker(
     //     iter /= 10;
     // }
 }
-pub fn update_active_ability(mut query : Query<&mut Sprite, With<GoldTrackerSprite>>)
+pub fn update_active_ability(
+    mut query : Query<(&mut Sprite, &ActiveUpgradeTracker), With<ActiveUpgradeTracker>>,
+    game_data: Res<GameData>,
+    mouse_data: Res<MouseData>)
 {
+    for mut sprite in query.iter_mut()
+    {
+        if let Some(atlas) = &mut sprite.0.texture_atlas
+        {
+            atlas.index = 0;
+        }
+    }
 
+    let active_order = match mouse_data.equipped_magic_item
+    {
+        MagicItem::PiuPiuPiu(_) => 0,
+        MagicItem::Piuuum(_, _) => 1,
+        MagicItem::KaBum(_, _) => 3,
+        _ => 2
+    };
+
+    let mut active = query.iter_mut()
+        .find_map(|a| if a.1.order == active_order { Some(a.0) } else { None });
+
+    if let Some(a) = &mut active
+    {
+        if let Some(atlas) = &mut a.texture_atlas
+        {
+            atlas.index = 1;
+        }
+    }
 }
