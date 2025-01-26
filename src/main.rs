@@ -16,7 +16,7 @@ use crate::game_data::{game_loop_system, GameData, PlayerConsts};
 use crate::game_state::*;
 use crate::gameui::{spawn_ui, update_active_ability, update_gold_tracker};
 use crate::generator::*;
-use crate::input::{cursor_position, equip_magic_items, grab_mouse, mouse_click_system, MouseData};
+use crate::input::{cursor_position, end_nosoloh, equip_magic_items, grab_mouse, mouse_click_system, MouseData};
 use crate::timer::{GameIterationTimer};
 
 #[derive(Resource, Default)]
@@ -161,7 +161,8 @@ fn main()
         .add_systems(OnEnter(GameStates::Next), (spawn_ui,start_music,initialize_grid).chain())
         .add_systems(Update, (cursor_position, grab_mouse, mouse_click_system,
                               equip_magic_items, cells_system, update_effects,
-                              game_loop_system, update_gold_tracker, update_active_ability, play_sound).chain())
+                              game_loop_system, update_gold_tracker, update_active_ability, play_sound,
+                              end_nosoloh).chain())
         .run();
 }
 

@@ -1,3 +1,4 @@
+use std::time::Duration;
 use crate::cells::Cell;
 use crate::cells::*;
 use crate::generator::SPRITE_SIZE;
@@ -7,6 +8,12 @@ use bevy::{prelude::*, window::CursorGrabMode};
 use crate::game_data::GameData;
 use crate::PopSound;
 use crate::timer::GameIterationTimer;
+
+#[derive(Component)]
+pub struct Noso
+{
+    timer: Timer
+}
 
 pub enum MagicItem {
     PiuPiuPiu(i32),
@@ -44,8 +51,25 @@ pub fn grab_mouse(
     }
 }
 
+pub fn end_nosoloh(
+    mut commands: Commands,
+    mut q_noso: Query<(&mut Sprite, &mut Noso, Entity), With<Noso>>,
+    timer: Res<Time>,
+)
+{
+    for mut q in q_noso.iter_mut() {
+        q.1.timer.tick(timer.delta());
+
+        if q.1.timer.just_finished() {
+            commands.entity(q.2).despawn();
+        }
+    }
+}
+
 // TODO :: Implement
 pub fn mouse_click_system(
+    asset_server: Res<AssetServer>,
+    mut commands: Commands,
     mouse_button_input: Res<ButtonInput<MouseButton>>,
     mouse_data: Res<MouseData>,
     mut sound_data : ResMut<PopSound>,
@@ -75,6 +99,13 @@ pub fn mouse_click_system(
                 mouse_data.last_mouse_pos,
                 game_data.player_currency
             ),
+            MagicItem::Wololo(_, _) =>
+            {
+                let image :Handle<Image> = asset_server.load("sprites/image-1-export.png");
+                commands.spawn((Sprite::from_image(image.clone()), Transform::from_xyz(0., 0., 10.),
+                                Noso{timer: Timer::new(Duration::from_secs(2), TimerMode::Once)}));
+                -100
+            },
             _ => 0,
         };
         game_data.player_currency -= cost;
