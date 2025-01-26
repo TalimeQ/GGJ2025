@@ -5,6 +5,7 @@ use bevy::input::mouse::MouseMotion;
 use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, window::CursorGrabMode};
 use crate::game_data::GameData;
+use crate::PopSound;
 use crate::timer::GameIterationTimer;
 
 enum MagicItem {
@@ -47,10 +48,12 @@ pub fn grab_mouse(
 pub fn mouse_click_system(
     mouse_button_input: Res<ButtonInput<MouseButton>>,
     mouse_data: Res<MouseData>,
+    mut sound_data : ResMut<PopSound>,
     q_cells: Query<(&mut Cell, &mut Transform)>,
     mut game_data: ResMut<GameData>,
 ) {
     if mouse_button_input.just_pressed(MouseButton::Left) {
+        sound_data.should_play_place = true;
 
         let cost = match mouse_data.equipped_magic_item {
             MagicItem::PiuPiuPiu(cost) => spawn_piupiupiu(
