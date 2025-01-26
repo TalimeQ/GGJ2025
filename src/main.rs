@@ -32,6 +32,9 @@ fn start_music(asset_server: Res<AssetServer>, mut commands: Commands) {
         asset_server.load("sounds/ZbrodniaPrzeciwLudzkosci.ogg")),
         PlaybackSettings::LOOP,
     ));
+
+    commands.spawn((AudioPlayer::new(asset_server.load("sounds/ZbrodniaPrzeciwLudzkosci.ogg")),
+    PlaybackSettings::DESPAWN));
 }
 
 fn main()
